@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma
+
+# pièces d'identité uploadées par les locateurs (jamais dans le repo)
+/stockage-prive
+
+# ancienne base SQLite locale, remplacée par Postgres (Neon)
+/dev.db
+/prisma/migrations-sqlite-backup

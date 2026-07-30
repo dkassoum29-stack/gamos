@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Gamos — Location de voitures au Burkina Faso
 
-## Getting Started
+Site de mise en relation entre **locateurs** (agences ou particuliers qui louent leurs voitures) et **clients** qui cherchent une voiture à louer. Plusieurs locateurs peuvent s'inscrire et gérer leurs propres véhicules.
 
-First, run the development server:
+## Fonctionnement
+
+**Côté client (pas besoin de compte)**
+- Parcourir toutes les voitures disponibles sur la page d'accueil
+- Filtrer par ville, type de véhicule et prix maximum par jour
+- Voir la fiche détaillée d'une voiture (caractéristiques, locateur, téléphone)
+- Envoyer une demande de réservation (dates + nom + téléphone)
+
+**Côté locateur (compte requis)**
+- Créer un compte locateur (nom d'agence, ville, téléphone, email, mot de passe)
+- Ajouter ses voitures : marque, modèle, année, ville, type, transmission, places, prix/jour, photo, description
+- Masquer / rendre disponible ou supprimer une voiture
+- Voir les demandes de réservation reçues et les **confirmer** ou **refuser**
+
+Le paiement se fait **hors ligne** (cash ou Mobile Money en direct entre le client et le locateur) — le site sert de vitrine et de canal de demande.
+
+## Démarrer le site en local
 
 ```bash
+npm install
+npx prisma migrate dev    # crée la base de données
+npm run seed              # ajoute des données de démonstration
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Le site est ensuite accessible sur http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Comptes de démonstration
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Les données de démo créent 3 locateurs avec 6 voitures. Mot de passe pour tous : `motdepasse123`
 
-## Learn More
+| Locateur | Email |
+| --- | --- |
+| Faso Auto Location (Ouagadougou) | `contact@fasoauto.bf` |
+| Bobo Car Rent (Bobo-Dioulasso) | `contact@bobocarrent.bf` |
+| Issa K. — particulier (Ouagadougou) | `issa.k@example.com` |
 
-To learn more about Next.js, take a look at the following resources:
+## Technologies
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Next.js 16** (App Router) + **React 19** + **TypeScript**
+- **Tailwind CSS 4** pour le style
+- **Prisma 7** + **SQLite** pour la base de données
+- Authentification maison : mots de passe hachés avec **bcrypt**, session en cookie JWT signé (**jose**)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Structure du projet
 
-## Deploy on Vercel
+```
+src/
+├── app/
+│   ├── page.tsx                        # Accueil : liste + filtres des voitures
+│   ├── voitures/[id]/                  # Fiche voiture + formulaire de réservation
+│   └── locateur/
+│       ├── inscription/                # Création de compte locateur
+│       ├── connexion/                  # Connexion locateur
+│       ├── actions.ts                  # Inscription / connexion / déconnexion
+│       └── tableau-de-bord/
+│           ├── page.tsx                # Mes voitures
+│           ├── voitures/nouvelle/      # Ajouter une voiture
+│           ├── reservations/           # Demandes reçues (confirmer / refuser)
+│           └── actions.ts              # Actions voitures + réponses réservations
+├── components/                         # Navbar, CarCard
+└── lib/
+    ├── prisma.ts                       # Client base de données
+    ├── auth.ts                         # Sessions et protection des pages
+    └── format.ts                       # FCFA, listes villes / types / transmissions
+prisma/
+├── schema.prisma                       # Modèles Locateur, Voiture, Reservation
+└── seed.ts                             # Données de démonstration
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Pistes pour la suite
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Paiement en ligne (Orange Money / Moov Money) pour un acompte à la réservation
+- Notifications SMS ou WhatsApp au locateur quand une demande arrive
+- Upload de photos depuis le téléphone (au lieu d'une URL)
+- Avis et notes sur les locateurs
+- Vérification des locateurs (pièce d'identité, carte grise) pour rassurer les clients
+
+## Avant une mise en production
+
+- Changer `AUTH_SECRET` dans `.env` par une valeur longue et aléatoire
+- Passer de SQLite à PostgreSQL (base hébergée) pour supporter plusieurs utilisateurs simultanés

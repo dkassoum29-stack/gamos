@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Locateur {
+  id                  String   @id @default(cuid())
+  nomAgence            String
+  ville                String
+  telephone            String
+  email                String   @unique
+  motDePasse           String
+  createdAt            DateTime @default(now())
+  voitures             Voiture[]
+  statutVerification   String   @default("non_soumis") // non_soumis, en_attente, verifie, refuse
+  pieceIdentiteChemin  String?
+  pieceIdentiteEnvoyeeLe DateTime?
+}
+
+model Client {
+  id           String        @id @default(cuid())
+  nom          String
+  email        String        @unique
+  telephone    String
+  motDePasse   String
+  createdAt    DateTime      @default(now())
+  reservations Reservation[]
+  avis         Avis[]
+}
+
+model Admin {
+  id         String   @id @default(cuid())
+  nom        String
+  email      String   @unique
+  motDePasse String
+  createdAt  DateTime @default(now())
+}
+
+model Voiture {
+  id            String   @id @default(cuid())
+  locateur      Locateur @relation(fields: [locateurId], references: [id], onDelete: Cascade)
+  locateurId    String
+  marque        String
+  modele        String
+  annee         Int
+  ville         String
+  type          String   // ex: Citadine, SUV, Berline, Minibus, 4x4
+  transmission  String   // Manuelle, Automatique
+  places        Int
+  prixParJour   Int      // en FCFA
+  photoUrl      String?
+  photoUrl2     String?
+  photoUrl3     String?
+  description   String?
+  disponible    Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  reservations  Reservation[]
+  avis          Avis[]
+  indisponibilites Indisponibilite[]
+}
+
+model Avis {
+  id            String       @id @default(cuid())
+  voiture       Voiture      @relation(fields: [voitureId], references: [id], onDelete: Cascade)
+  voitureId     String
+  reservation   Reservation? @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  reservationId String?      @unique
+  client        Client?      @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  clientId      String?
+  nomClient     String
+  note          Int          // de 1 à 5
+  commentaire   String?
+  createdAt     DateTime     @default(now())
+}
+
+model Reservation {
+  id            String   @id @default(cuid())
+  voiture       Voiture  @relation(fields: [voitureId], references: [id], onDelete: Cascade)
+  voitureId     String
+  client        Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  clientId      String?
+  nomClient     String
+  telephoneClient String
+  dateDebut     DateTime
+  dateFin       DateTime
+  message       String?
+  statut        String   @default("en_attente") // en_attente, confirmee, refusee
+  createdAt     DateTime @default(now())
+  avis          Avis?
+}
+
+model Indisponibilite {
+  id            String   @id @default(cuid())
+  voiture       Voiture  @relation(fields: [voitureId], references: [id], onDelete: Cascade)
+  voitureId     String
+  dateDebut     DateTime
+  dateFin       DateTime
+  note          String?
+  createdAt     DateTime @default(now())
+}
