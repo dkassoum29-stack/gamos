@@ -13,10 +13,10 @@ datasource db {
 model Locateur {
   id                  String   @id @default(cuid())
   nomAgence            String
-  ville                String
-  telephone            String
+  ville                String?
+  telephone            String?
   email                String   @unique
-  motDePasse           String
+  motDePasse           String?
   createdAt            DateTime @default(now())
   voitures             Voiture[]
   statutVerification   String   @default("non_soumis") // non_soumis, en_attente, verifie, refuse
@@ -28,8 +28,8 @@ model Client {
   id           String        @id @default(cuid())
   nom          String
   email        String        @unique
-  telephone    String
-  motDePasse   String
+  telephone    String?
+  motDePasse   String?
   createdAt    DateTime      @default(now())
   reservations Reservation[]
   avis         Avis[]
@@ -39,7 +39,7 @@ model Admin {
   id         String   @id @default(cuid())
   nom        String
   email      String   @unique
-  motDePasse String
+  motDePasse String?
   createdAt  DateTime @default(now())
 }
 

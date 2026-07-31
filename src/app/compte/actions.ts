@@ -2,8 +2,9 @@
 
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { createClientSession, destroyClientSession } from "@/lib/auth";
+import { createClientSession, destroyClientSession, requireClient } from "@/lib/auth";
 
 export type FormState = { error?: string } | undefined;
 
@@ -48,6 +49,9 @@ export async function connexionClientAction(
   if (!client) {
     return { error: "Email ou mot de passe incorrect." };
   }
+  if (!client.motDePasse) {
+    return { error: "Ce compte utilise la connexion Google. Utilise le bouton Google ci-dessous." };
+  }
 
   const valide = await bcrypt.compare(motDePasse, client.motDePasse);
   if (!valide) {
@@ -61,4 +65,23 @@ export async function connexionClientAction(
 export async function deconnexionClientAction() {
   await destroyClientSession();
   redirect("/");
+}
+
+export async function mettreAJourTelephoneAction(
+  _prevState: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const client = await requireClient();
+
+  const telephone = String(formData.get("telephone") ?? "").trim();
+  if (!telephone) {
+    return { error: "Merci de renseigner un numéro de téléphone." };
+  }
+
+  await prisma.client.update({
+    where: { id: client.id },
+    data: { telephone },
+  });
+
+  revalidatePath("/compte/tableau-de-bord");
 }

@@ -195,7 +195,7 @@ async function main() {
           voitureId: corolla.id,
           clientId: clientTest.id,
           nomClient: clientTest.nom,
-          telephoneClient: clientTest.telephone,
+          telephoneClient: clientTest.telephone ?? "",
           dateDebut: new Date(new Date().setDate(new Date().getDate() + 5)),
           dateFin: new Date(new Date().setDate(new Date().getDate() + 8)),
           statut: "confirmee",

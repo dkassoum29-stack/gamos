@@ -2,7 +2,12 @@
 
 import { useActionState } from "react";
 import { connexionAdminAction } from "../actions";
-import AuthCard, { ChampAvecIcone, ErreurFormulaire } from "@/components/AuthCard";
+import AuthCard, {
+  ChampAvecIcone,
+  ErreurFormulaire,
+  Diviseur,
+  BoutonGoogle,
+} from "@/components/AuthCard";
 import { IconMail, IconLock } from "@/components/icons";
 
 export default function ConnexionAdminPage() {
@@ -50,6 +55,9 @@ export default function ConnexionAdminPage() {
           {pending ? "Connexion..." : "Se connecter"}
         </button>
       </form>
+
+      <Diviseur />
+      <BoutonGoogle role="admin" />
     </AuthCard>
   );
 }

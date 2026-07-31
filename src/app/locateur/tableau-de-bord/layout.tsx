@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { requireLocateur } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { logoutAction } from "@/app/locateur/actions";
@@ -10,6 +11,10 @@ export default async function TableauDeBordLayout({
   children: React.ReactNode;
 }) {
   const locateur = await requireLocateur();
+
+  if (!locateur.ville || !locateur.telephone) {
+    redirect("/locateur/completer-profil");
+  }
 
   const demandesEnAttente = await prisma.reservation.count({
     where: { statut: "en_attente", voiture: { locateurId: locateur.id } },

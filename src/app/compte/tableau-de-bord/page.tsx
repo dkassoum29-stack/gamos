@@ -3,6 +3,7 @@ import { requireClient } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatFCFA } from "@/lib/format";
 import StarRating from "@/components/StarRating";
+import AjouterTelephoneForm from "./AjouterTelephoneForm";
 
 const STATUT_LABELS: Record<string, { label: string; classes: string }> = {
   en_attente: { label: "En attente", classes: "bg-amber-50 text-amber-700" },
@@ -31,6 +32,8 @@ export default async function TableauDeBordClientPage() {
         Bonjour {client.nom}
       </h1>
       <p className="text-sm text-zinc-500">{client.email}</p>
+
+      {!client.telephone && <AjouterTelephoneForm />}
 
       <div className="mt-8">
         <h2 className="font-display font-semibold text-zinc-900 mb-3">

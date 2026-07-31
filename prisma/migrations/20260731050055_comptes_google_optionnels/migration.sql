@@ -1,0 +1,11 @@
+-- AlterTable
+ALTER TABLE "Admin" ALTER COLUMN "motDePasse" DROP NOT NULL;
+
+-- AlterTable
+ALTER TABLE "Client" ALTER COLUMN "telephone" DROP NOT NULL,
+ALTER COLUMN "motDePasse" DROP NOT NULL;
+
+-- AlterTable
+ALTER TABLE "Locateur" ALTER COLUMN "ville" DROP NOT NULL,
+ALTER COLUMN "telephone" DROP NOT NULL,
+ALTER COLUMN "motDePasse" DROP NOT NULL;

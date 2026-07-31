@@ -24,6 +24,12 @@ export async function creerReservationAction(
   if (!client) {
     return { error: "Connecte-toi à ton compte pour envoyer une demande de réservation." };
   }
+  if (!client.telephone) {
+    return {
+      error:
+        "Ajoute un numéro de téléphone à ton profil avant de réserver, pour que le locateur puisse te recontacter.",
+    };
+  }
 
   const dateDebutStr = String(formData.get("dateDebut") ?? "");
   const dateFinStr = String(formData.get("dateFin") ?? "");

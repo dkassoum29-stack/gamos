@@ -6,6 +6,7 @@ import {
   IconShieldCheck,
   IconBuilding,
   IconUsers,
+  IconSettings,
 } from "@/components/icons";
 
 const LIENS = [
@@ -13,6 +14,7 @@ const LIENS = [
   { href: "/admin/verifications", label: "Vérifications", icon: IconShieldCheck },
   { href: "/admin/locateurs", label: "Locateurs", icon: IconBuilding },
   { href: "/admin/clients", label: "Clients", icon: IconUsers },
+  { href: "/admin/parametres", label: "Paramètres", icon: IconSettings },
 ];
 
 export default async function AdminLayout({

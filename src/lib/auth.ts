@@ -1,6 +1,7 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
 const secret = new TextEncoder().encode(
@@ -156,4 +157,20 @@ export async function requireAdmin() {
 export async function destroyAdminSession() {
   const cookieStore = await cookies();
   cookieStore.delete(ADMIN_COOKIE_NAME);
+}
+
+// Garantit que le compte administrateur "propriétaire" existe toujours,
+// même si la ligne a été supprimée de la table Admin par erreur.
+export async function assurerAdminProprietaire() {
+  const email = process.env.OWNER_ADMIN_EMAIL?.trim().toLowerCase();
+  const motDePasse = process.env.OWNER_ADMIN_PASSWORD;
+  if (!email || !motDePasse) return;
+
+  const existant = await prisma.admin.findUnique({ where: { email } });
+  if (!existant) {
+    const hash = await bcrypt.hash(motDePasse, 10);
+    await prisma.admin.create({
+      data: { nom: "Propriétaire", email, motDePasse: hash },
+    });
+  }
 }

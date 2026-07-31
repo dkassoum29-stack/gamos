@@ -3,7 +3,12 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { loginAction } from "../actions";
-import AuthCard, { ChampAvecIcone, ErreurFormulaire } from "@/components/AuthCard";
+import AuthCard, {
+  ChampAvecIcone,
+  ErreurFormulaire,
+  Diviseur,
+  BoutonGoogle,
+} from "@/components/AuthCard";
 import { IconMail, IconLock } from "@/components/icons";
 
 export default function ConnexionPage() {
@@ -59,6 +64,9 @@ export default function ConnexionPage() {
           {pending ? "Connexion..." : "Se connecter"}
         </button>
       </form>
+
+      <Diviseur />
+      <BoutonGoogle role="locateur" />
     </AuthCard>
   );
 }

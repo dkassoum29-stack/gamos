@@ -189,7 +189,7 @@ export default async function VoiturePage({
             {client ? (
               <ReservationForm
                 voitureId={voiture.id}
-                locateurTelephone={voiture.locateur.telephone}
+                locateurTelephone={voiture.locateur.telephone ?? ""}
                 marque={voiture.marque}
                 modele={voiture.modele}
               />
