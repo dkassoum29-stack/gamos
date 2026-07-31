@@ -5,6 +5,7 @@ import Link from "next/link";
 import { inscriptionClientAction } from "../actions";
 import AuthCard, {
   ChampAvecIcone,
+  ChampMotDePasse,
   ErreurFormulaire,
   Diviseur,
   BoutonGoogle,
@@ -67,11 +68,10 @@ export default function InscriptionClientPage() {
           <label className="mb-1 block text-sm font-medium text-zinc-700">
             Mot de passe
           </label>
-          <ChampAvecIcone
+          <ChampMotDePasse
             icon={<IconLock />}
             name="motDePasse"
             required
-            type="password"
             minLength={6}
             placeholder="6 caractères minimum"
           />

@@ -82,6 +82,41 @@ export async function requireAdmin() {
   return admin;
 }
 
+const RESET_PURPOSE = "reset-password";
+
+// Le hash du mot de passe actuel sert d'empreinte : dès que le mot de
+// passe change (ou qu'un autre jeton a déjà été utilisé), les anciens
+// jetons de réinitialisation deviennent invalides automatiquement.
+export async function creerJetonReinitialisation(
+  clientId: string,
+  motDePasseHashActuel: string | null
+) {
+  return new SignJWT({
+    clientId,
+    purpose: RESET_PURPOSE,
+    fp: motDePasseHashActuel ?? "",
+  })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("1h")
+    .sign(secret);
+}
+
+export async function verifierJetonReinitialisation(token: string) {
+  try {
+    const { payload } = await jwtVerify(token, secret);
+    if (payload.purpose !== RESET_PURPOSE || typeof payload.clientId !== "string") {
+      return null;
+    }
+    const client = await prisma.client.findUnique({ where: { id: payload.clientId } });
+    if (!client) return null;
+    if ((client.motDePasse ?? "") !== (payload.fp ?? "")) return null;
+    return client;
+  } catch {
+    return null;
+  }
+}
+
 // Garantit que le compte administrateur "propriétaire" existe toujours,
 // même si son statut admin a été retiré par erreur.
 export async function assurerAdminProprietaire() {

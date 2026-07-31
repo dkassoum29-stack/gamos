@@ -3,13 +3,26 @@
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import {
   createSession,
   destroySession,
   requireClient,
   assurerAdminProprietaire,
+  creerJetonReinitialisation,
+  verifierJetonReinitialisation,
 } from "@/lib/auth";
+import { envoyerEmailReinitialisation } from "@/lib/email";
+
+async function origineActuelle() {
+  const h = await headers();
+  const host = h.get("host");
+  const proto =
+    h.get("x-forwarded-proto") ??
+    (process.env.NODE_ENV === "production" ? "https" : "http");
+  return `${proto}://${host}`;
+}
 
 export type FormState = { error?: string } | undefined;
 
@@ -91,4 +104,55 @@ export async function mettreAJourTelephoneAction(
   });
 
   revalidatePath("/compte/tableau-de-bord");
+}
+
+export type ReinitFormState = { error?: string; success?: boolean } | undefined;
+
+export async function demanderReinitialisationAction(
+  _prevState: ReinitFormState,
+  formData: FormData
+): Promise<ReinitFormState> {
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  if (!email) {
+    return { error: "Merci de renseigner un email." };
+  }
+
+  const client = await prisma.client.findUnique({ where: { email } });
+  // Toujours la même réponse, que le compte existe ou non : on n'indique
+  // jamais si une adresse est inscrite ou pas.
+  if (client?.motDePasse) {
+    const token = await creerJetonReinitialisation(client.id, client.motDePasse);
+    const origine = await origineActuelle();
+    const lien = `${origine}/compte/reinitialiser?token=${token}`;
+    await envoyerEmailReinitialisation(client.email, lien);
+  }
+
+  return { success: true };
+}
+
+export async function reinitialiserMotDePasseAction(
+  token: string,
+  _prevState: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const client = await verifierJetonReinitialisation(token);
+  if (!client) {
+    return {
+      error: "Ce lien a expiré ou a déjà été utilisé. Refais une demande de réinitialisation.",
+    };
+  }
+
+  const motDePasse = String(formData.get("motDePasse") ?? "");
+  if (motDePasse.length < 6) {
+    return { error: "Le mot de passe doit contenir au moins 6 caractères." };
+  }
+
+  const hash = await bcrypt.hash(motDePasse, 10);
+  await prisma.client.update({
+    where: { id: client.id },
+    data: { motDePasse: hash },
+  });
+
+  await createSession(client.id);
+  redirect("/compte/tableau-de-bord");
 }

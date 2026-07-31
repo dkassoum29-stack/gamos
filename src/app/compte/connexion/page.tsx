@@ -5,6 +5,7 @@ import Link from "next/link";
 import { connexionClientAction } from "../actions";
 import AuthCard, {
   ChampAvecIcone,
+  ChampMotDePasse,
   ErreurFormulaire,
   Diviseur,
   BoutonGoogle,
@@ -46,15 +47,18 @@ export default function ConnexionClientPage() {
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-zinc-700">
-            Mot de passe
-          </label>
-          <ChampAvecIcone
-            icon={<IconLock />}
-            name="motDePasse"
-            required
-            type="password"
-          />
+          <div className="mb-1 flex items-center justify-between">
+            <label className="block text-sm font-medium text-zinc-700">
+              Mot de passe
+            </label>
+            <Link
+              href="/compte/mot-de-passe-oublie"
+              className="text-xs font-medium text-zinc-500 hover:text-zinc-900"
+            >
+              Oublié ?
+            </Link>
+          </div>
+          <ChampMotDePasse icon={<IconLock />} name="motDePasse" required />
         </div>
 
         {state?.error && <ErreurFormulaire message={state.error} />}
