@@ -149,27 +149,32 @@ export default function AjouterVoitureForm() {
 
       <div>
         <label className="block text-sm font-medium text-zinc-700 mb-1">
-          Photos (jusqu&apos;à 3 URLs, optionnel)
+          Photos (jusqu&apos;à 3, optionnel)
         </label>
-        <div className="flex flex-col gap-2">
-          <input
-            name="photoUrl"
-            type="url"
-            placeholder="Photo principale : https://..."
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
-          />
-          <input
-            name="photoUrl2"
-            type="url"
-            placeholder="Photo 2 (optionnel) : https://..."
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
-          />
-          <input
-            name="photoUrl3"
-            type="url"
-            placeholder="Photo 3 (optionnel) : https://..."
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
-          />
+        <p className="text-xs text-zinc-500 mb-2">
+          Choisis une photo depuis ta galerie, ou colle un lien si tu en as
+          déjà un en ligne.
+        </p>
+        <div className="flex flex-col gap-3">
+          {[1, 2, 3].map((n) => (
+            <div key={n} className="flex flex-col gap-1.5 rounded-lg border border-zinc-200 p-2.5">
+              <span className="text-xs font-medium text-zinc-500">
+                Photo {n === 1 ? "principale" : n} {n > 1 && "(optionnel)"}
+              </span>
+              <input
+                name={`photoFichier${n === 1 ? "" : n}`}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="w-full text-sm text-zinc-600 file:mr-3 file:rounded-full file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-zinc-700 hover:file:bg-zinc-200"
+              />
+              <input
+                name={`photoUrl${n === 1 ? "" : n}`}
+                type="url"
+                placeholder="ou colle un lien : https://..."
+                className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
+              />
+            </div>
+          ))}
         </div>
       </div>
 

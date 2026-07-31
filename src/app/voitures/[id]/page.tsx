@@ -192,6 +192,7 @@ export default async function VoiturePage({
                 locateurTelephone={voiture.locateur.telephone ?? ""}
                 marque={voiture.marque}
                 modele={voiture.modele}
+                plagesIndisponibles={plagesIndisponibles}
               />
             ) : (
               <ConnexionRequise texte="Connecte-toi pour envoyer une demande de réservation." />

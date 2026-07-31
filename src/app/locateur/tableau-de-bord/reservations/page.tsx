@@ -3,6 +3,7 @@ import { requireLocateur } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { lienWhatsApp } from "@/lib/format";
 import { repondreReservationAction } from "../actions";
+import AjouterReservationManuelleForm from "./AjouterReservationManuelleForm";
 
 const STATUT_LABELS: Record<string, { label: string; classes: string }> = {
   en_attente: { label: "En attente", classes: "bg-amber-50 text-amber-700" },
@@ -13,11 +14,18 @@ const STATUT_LABELS: Record<string, { label: string; classes: string }> = {
 export default async function ReservationsPage() {
   const locateur = await requireLocateur();
 
-  const reservations = await prisma.reservation.findMany({
-    where: { voiture: { locateurId: locateur.id } },
-    include: { voiture: true },
-    orderBy: { createdAt: "desc" },
-  });
+  const [reservations, voitures] = await Promise.all([
+    prisma.reservation.findMany({
+      where: { voiture: { locateurId: locateur.id } },
+      include: { voiture: true },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.voiture.findMany({
+      where: { locateurId: locateur.id },
+      select: { id: true, marque: true, modele: true },
+      orderBy: { marque: "asc" },
+    }),
+  ]);
 
   return (
     <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 py-10">
@@ -30,6 +38,10 @@ export default async function ReservationsPage() {
       <h1 className="mt-2 font-display text-2xl font-bold text-zinc-900">
         Demandes de réservation
       </h1>
+
+      <div className="mt-6">
+        <AjouterReservationManuelleForm voitures={voitures} />
+      </div>
 
       <div className="mt-6 flex flex-col gap-4">
         {reservations.length === 0 ? (

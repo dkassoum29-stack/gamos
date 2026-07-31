@@ -1,26 +1,42 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { creerReservationAction } from "./actions";
 import { lienWhatsApp } from "@/lib/format";
-import { IconCheck } from "@/components/icons";
+import { IconCheck, IconAlertCircle } from "@/components/icons";
 
 type ReservationFormProps = {
   voitureId: string;
   locateurTelephone: string;
   marque: string;
   modele: string;
+  plagesIndisponibles: { debut: string; fin: string }[];
 };
+
+function seChevauchent(debutA: Date, finA: Date, debutB: Date, finB: Date) {
+  return debutA <= finB && finA >= debutB;
+}
 
 export default function ReservationForm({
   voitureId,
   locateurTelephone,
   marque,
   modele,
+  plagesIndisponibles,
 }: ReservationFormProps) {
   const action = creerReservationAction.bind(null, voitureId);
   const [state, formAction, pending] = useActionState(action, undefined);
   const [dates, setDates] = useState({ debut: "", fin: "" });
+
+  const datesEnConflit = useMemo(() => {
+    if (!dates.debut || !dates.fin) return false;
+    const debut = new Date(dates.debut);
+    const fin = new Date(dates.fin);
+    if (fin < debut) return false;
+    return plagesIndisponibles.some((p) =>
+      seChevauchent(debut, fin, new Date(p.debut), new Date(p.fin))
+    );
+  }, [dates, plagesIndisponibles]);
 
   if (state?.success) {
     const message = `Bonjour, j'ai fait une demande de réservation sur Gamos pour la ${marque} ${modele}${
@@ -91,6 +107,14 @@ export default function ReservationForm({
         />
       </div>
 
+      {datesEnConflit && (
+        <p className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          <IconAlertCircle className="h-4 w-4 shrink-0" />
+          Ces dates sont déjà prises pour cette voiture. Regarde le
+          calendrier ci-dessus pour choisir d&apos;autres dates.
+        </p>
+      )}
+
       {state?.error && (
         <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">
           {state.error}
@@ -99,7 +123,7 @@ export default function ReservationForm({
 
       <button
         type="submit"
-        disabled={pending}
+        disabled={pending || datesEnConflit}
         className="btn-brand mt-1 rounded-full px-4 py-2.5 font-medium transition-all disabled:opacity-60"
       >
         {pending ? "Envoi..." : "Envoyer la demande de réservation"}
