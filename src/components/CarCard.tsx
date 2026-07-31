@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { formatFCFA, typeStyle } from "@/lib/format";
 import FavoriButton from "./FavoriButton";
+import { IconCar, IconMapPin, IconStar, IconCheck } from "./icons";
 
 type CarCardProps = {
   id: string;
@@ -35,9 +36,7 @@ export default function CarCard(car: CarCardProps) {
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
-          <span className="text-5xl" aria-hidden>
-            🚗
-          </span>
+          <IconCar className="h-12 w-12 text-zinc-300" />
         )}
         <div className="absolute top-3 left-3 flex gap-1.5">
           <span
@@ -60,7 +59,8 @@ export default function CarCard(car: CarCardProps) {
           </h3>
           {car.noteMoyenne != null && car.nombreAvis ? (
             <span className="shrink-0 flex items-center gap-1 text-sm text-amber-600 font-medium">
-              ★ {car.noteMoyenne.toFixed(1)}
+              <IconStar filled className="h-3.5 w-3.5" />
+              {car.noteMoyenne.toFixed(1)}
               <span className="text-zinc-400 font-normal">
                 ({car.nombreAvis})
               </span>
@@ -71,9 +71,12 @@ export default function CarCard(car: CarCardProps) {
           {car.annee} · {car.transmission} · {car.places} places
         </p>
         <p className="text-sm text-zinc-500 flex items-center gap-1">
-          📍 {car.ville} · {car.nomAgence}
+          <IconMapPin className="h-3.5 w-3.5 shrink-0" />
+          {car.ville} · {car.nomAgence}
           {car.locateurVerifie && (
-            <span className="text-[#3B82F6]" title="Locateur vérifié">✓</span>
+            <span title="Locateur vérifié" className="text-[#3B82F6]">
+              <IconCheck className="h-3.5 w-3.5 shrink-0" />
+            </span>
           )}
         </p>
         <p className="mt-2 font-display font-bold text-lg text-zinc-950">

@@ -5,7 +5,15 @@ import { logoutAction } from "@/app/locateur/actions";
 import { deconnexionClientAction } from "@/app/compte/actions";
 import { deconnexionAdminAction } from "@/app/admin/actions";
 import AccountDropdown from "./AccountDropdown";
-import { IconHeart, IconCar, IconSearch, IconKey, IconHome } from "./icons";
+import {
+  IconHeart,
+  IconCar,
+  IconSearch,
+  IconKey,
+  IconHome,
+  IconUser,
+  IconShieldCheck,
+} from "./icons";
 
 export default async function Navbar() {
   const session = await getSession();
@@ -86,6 +94,7 @@ export default async function Navbar() {
             sections={[
               {
                 titre: "Locataire",
+                icon: <IconUser className="h-4 w-4" />,
                 connecte: !!client,
                 nom: client?.nom,
                 sousTitre: client?.email,
@@ -93,31 +102,38 @@ export default async function Navbar() {
                 dashboardLabel: "Mes réservations",
                 deconnexionAction: deconnexionClientAction,
                 liensConnexion: [
-                  { label: "Connexion", href: "/compte/connexion" },
+                  { label: "Se connecter", href: "/compte/connexion" },
                   { label: "Créer un compte", href: "/compte/inscription" },
                 ],
               },
               {
                 titre: "Locateur",
+                icon: <IconKey className="h-4 w-4" />,
                 connecte: !!locateur,
                 nom: locateur?.nomAgence,
                 dashboardHref: "/locateur/tableau-de-bord",
                 dashboardLabel: "Tableau de bord",
                 deconnexionAction: logoutAction,
                 liensConnexion: [
-                  { label: "Connexion", href: "/locateur/connexion" },
+                  { label: "Se connecter", href: "/locateur/connexion" },
                   { label: "Devenir locateur", href: "/locateur/inscription" },
                 ],
               },
-              {
-                titre: "Administration",
-                connecte: !!admin,
-                nom: admin?.nom,
-                dashboardHref: "/admin",
-                dashboardLabel: "Tableau de bord admin",
-                deconnexionAction: deconnexionAdminAction,
-                liensConnexion: [{ label: "Connexion", href: "/admin/connexion" }],
-              },
+              // L'administration ne s'affiche que pour un admin déjà connecté :
+              // pas d'entrée publique invitant les visiteurs à s'y connecter.
+              ...(admin
+                ? [
+                    {
+                      titre: "Administration",
+                      icon: <IconShieldCheck className="h-4 w-4" />,
+                      connecte: true,
+                      nom: admin.nom,
+                      dashboardHref: "/admin",
+                      dashboardLabel: "Tableau de bord admin",
+                      deconnexionAction: deconnexionAdminAction,
+                    },
+                  ]
+                : []),
             ]}
           />
         </div>

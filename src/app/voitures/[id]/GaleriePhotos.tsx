@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { IconCar } from "@/components/icons";
 
 export default function GaleriePhotos({
   photos,
@@ -14,9 +15,7 @@ export default function GaleriePhotos({
   if (photos.length === 0) {
     return (
       <div className="aspect-[4/3] w-full rounded-2xl bg-zinc-100 flex items-center justify-center">
-        <span className="text-7xl" aria-hidden>
-          🚗
-        </span>
+        <IconCar className="h-16 w-16 text-zinc-300" />
       </div>
     );
   }
@@ -38,7 +37,7 @@ export default function GaleriePhotos({
               key={photo}
               type="button"
               onClick={() => setActif(i)}
-              className={`h-16 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition-colors ${
+              className={`h-16 w-20 shrink-0 cursor-pointer overflow-hidden rounded-lg border-2 transition-colors ${
                 i === actif ? "border-[#3B82F6]" : "border-transparent"
               }`}
             >

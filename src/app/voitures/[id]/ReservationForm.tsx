@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { creerReservationAction } from "./actions";
 import { lienWhatsApp } from "@/lib/format";
+import { IconCheck } from "@/components/icons";
 
 type ReservationFormProps = {
   voitureId: string;
@@ -28,7 +29,10 @@ export default function ReservationForm({
 
     return (
       <div className="rounded-2xl border border-green-200 bg-green-50 p-5 text-green-800">
-        <p className="font-semibold">Demande envoyée ✅</p>
+        <p className="flex items-center gap-1.5 font-semibold">
+          <IconCheck className="h-4 w-4" />
+          Demande envoyée
+        </p>
         <p className="text-sm mt-1">
           Le locateur va te contacter directement pour confirmer la
           réservation. Tu peux aussi le prévenir tout de suite :

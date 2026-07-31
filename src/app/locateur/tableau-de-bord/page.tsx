@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { formatFCFA } from "@/lib/format";
 import StatTile from "@/components/StatTile";
 import BarChart from "@/components/BarChart";
-import { IconCar, IconClipboard, IconShieldCheck, IconStar } from "@/components/icons";
+import { IconCar, IconClipboard, IconShieldCheck, IconStar, IconCheck } from "@/components/icons";
 
 const JOURS_HISTORIQUE = 14;
 
@@ -61,8 +61,9 @@ export default async function TableauDeBordPage() {
           Bonjour {locateur.nomAgence}
         </h1>
         {locateur.statutVerification === "verifie" && (
-          <span className="rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700">
-            Vérifié ✓
+          <span className="flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700">
+            <IconCheck className="h-3 w-3" />
+            Vérifié
           </span>
         )}
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { IconHeart } from "./icons";
 
 const CLE_STOCKAGE = "gamos_favoris";
 
@@ -42,11 +43,12 @@ export default function FavoriButton({ voitureId }: { voitureId: string }) {
       type="button"
       onClick={toggle}
       aria-label={actif ? "Retirer des favoris" : "Ajouter aux favoris"}
-      className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur text-lg shadow-sm hover:scale-110 transition-transform"
+      className="absolute top-3 right-3 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-white/90 backdrop-blur shadow-sm hover:scale-110 transition-transform"
     >
-      <span className={actif ? "text-rose-500" : "text-zinc-400"} aria-hidden>
-        {actif ? "♥" : "♡"}
-      </span>
+      <IconHeart
+        filled={actif}
+        className={actif ? "text-rose-500" : "text-zinc-400"}
+      />
     </button>
   );
 }

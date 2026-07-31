@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readFile } from "fs/promises";
 import { getAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { cheminCompletPiece } from "@/lib/stockage";
 
 export async function GET(
   _request: NextRequest,
@@ -19,22 +17,14 @@ export async function GET(
     return new NextResponse("Introuvable", { status: 404 });
   }
 
-  const extension = locateur.pieceIdentiteChemin.split(".").pop();
-  const contentType =
-    extension === "pdf"
-      ? "application/pdf"
-      : extension === "png"
-        ? "image/png"
-        : extension === "webp"
-          ? "image/webp"
-          : "image/jpeg";
-
-  try {
-    const octets = await readFile(cheminCompletPiece(locateur.pieceIdentiteChemin));
-    return new NextResponse(new Uint8Array(octets), {
-      headers: { "Content-Type": contentType },
-    });
-  } catch {
+  const reponse = await fetch(locateur.pieceIdentiteChemin);
+  if (!reponse.ok || !reponse.body) {
     return new NextResponse("Fichier introuvable", { status: 404 });
   }
+
+  return new NextResponse(reponse.body, {
+    headers: {
+      "Content-Type": reponse.headers.get("content-type") ?? "application/octet-stream",
+    },
+  });
 }

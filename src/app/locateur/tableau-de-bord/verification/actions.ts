@@ -18,7 +18,11 @@ export async function soumettreVerificationAction(
     return { error: "Merci de choisir un fichier." };
   }
 
-  const resultat = await enregistrerPieceIdentite(locateur.id, fichier);
+  const resultat = await enregistrerPieceIdentite(
+    locateur.id,
+    fichier,
+    locateur.pieceIdentiteChemin
+  );
   if ("error" in resultat) {
     return { error: resultat.error };
   }

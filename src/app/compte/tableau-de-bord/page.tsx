@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireClient } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatFCFA } from "@/lib/format";
+import StarRating from "@/components/StarRating";
 
 const STATUT_LABELS: Record<string, { label: string; classes: string }> = {
   en_attente: { label: "En attente", classes: "bg-amber-50 text-amber-700" },
@@ -95,10 +96,7 @@ export default async function TableauDeBordClientPage() {
                   >
                     {a.voiture.marque} {a.voiture.modele}
                   </Link>
-                  <span className="text-amber-500 text-sm">
-                    {"★".repeat(a.note)}
-                    <span className="text-zinc-300">{"★".repeat(5 - a.note)}</span>
-                  </span>
+                  <StarRating note={a.note} className="h-3.5 w-3.5" />
                 </div>
                 {a.commentaire && (
                   <p className="mt-1 text-sm text-zinc-600">{a.commentaire}</p>

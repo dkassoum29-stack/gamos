@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { creerAvisAction } from "./actions";
+import { IconStar } from "@/components/icons";
 
 export default function AvisForm({ voitureId }: { voitureId: string }) {
   const action = creerAvisAction.bind(null, voitureId);
@@ -27,16 +28,16 @@ export default function AvisForm({ voitureId }: { voitureId: string }) {
           Note
         </label>
         <input type="hidden" name="note" value={note} />
-        <div className="flex gap-1 text-2xl">
+        <div className="flex gap-1">
           {[1, 2, 3, 4, 5].map((n) => (
             <button
               key={n}
               type="button"
               onClick={() => setNote(n)}
               aria-label={`${n} étoile${n > 1 ? "s" : ""}`}
-              className={n <= note ? "text-amber-500" : "text-zinc-300"}
+              className={`cursor-pointer transition-colors ${n <= note ? "text-amber-500" : "text-zinc-300"}`}
             >
-              ★
+              <IconStar filled={n <= note} className="h-6 w-6" />
             </button>
           ))}
         </div>

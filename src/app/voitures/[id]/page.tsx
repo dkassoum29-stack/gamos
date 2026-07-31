@@ -7,6 +7,8 @@ import ReservationForm from "./ReservationForm";
 import AvisForm from "./AvisForm";
 import GaleriePhotos from "./GaleriePhotos";
 import Calendrier from "./Calendrier";
+import StarRating from "@/components/StarRating";
+import { IconMapPin, IconStar, IconCheck } from "@/components/icons";
 
 function ConnexionRequise({ texte }: { texte: string }) {
   return (
@@ -87,10 +89,14 @@ export default async function VoiturePage({
               </span>
             </div>
             <div className="mt-1 flex items-center gap-2 text-zinc-500">
-              <span>📍 {voiture.ville}</span>
+              <span className="flex items-center gap-1">
+                <IconMapPin className="h-4 w-4 shrink-0" />
+                {voiture.ville}
+              </span>
               {noteMoyenne != null && (
                 <span className="flex items-center gap-1 text-amber-600 font-medium">
-                  ★ {noteMoyenne.toFixed(1)}
+                  <IconStar filled className="h-4 w-4" />
+                  {noteMoyenne.toFixed(1)}
                   <span className="text-zinc-400 font-normal">
                     ({nombreAvis} avis)
                   </span>
@@ -127,8 +133,9 @@ export default async function VoiturePage({
             <div className="flex items-center gap-1.5">
               <p className="font-semibold text-zinc-900">{voiture.locateur.nomAgence}</p>
               {voiture.locateur.statutVerification === "verifie" && (
-                <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-semibold text-[#3B82F6]">
-                  Vérifié ✓
+                <span className="flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-semibold text-[#3B82F6]">
+                  <IconCheck className="h-3 w-3" />
+                  Vérifié
                 </span>
               )}
             </div>
@@ -149,10 +156,7 @@ export default async function VoiturePage({
                   <li key={a.id} className="border-b border-zinc-100 pb-3 last:border-0 last:pb-0">
                     <div className="flex items-center justify-between">
                       <span className="font-medium text-zinc-900">{a.nomClient}</span>
-                      <span className="text-amber-500 text-sm">
-                        {"★".repeat(a.note)}
-                        <span className="text-zinc-300">{"★".repeat(5 - a.note)}</span>
-                      </span>
+                      <StarRating note={a.note} className="h-3.5 w-3.5" />
                     </div>
                     {a.commentaire && (
                       <p className="text-sm text-zinc-600 mt-1">{a.commentaire}</p>

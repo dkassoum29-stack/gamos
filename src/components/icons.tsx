@@ -72,10 +72,32 @@ export function IconCalendarClock({ className }: IconProps) {
   );
 }
 
-export function IconStar({ className }: IconProps) {
+export function IconStar({ className, filled }: IconProps & { filled?: boolean }) {
+  return (
+    <svg
+      {...base}
+      fill={filled ? "currentColor" : "none"}
+      className={className}
+      aria-hidden
+    >
+      <path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.7l5.9-.8Z" />
+    </svg>
+  );
+}
+
+export function IconMapPin({ className }: IconProps) {
   return (
     <svg {...base} className={className} aria-hidden>
-      <path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.7l5.9-.8Z" />
+      <path d="M12 21s-6.5-5.7-6.5-11a6.5 6.5 0 0 1 13 0c0 5.3-6.5 11-6.5 11Z" />
+      <circle cx="12" cy="10" r="2.3" />
+    </svg>
+  );
+}
+
+export function IconCheck({ className }: IconProps) {
+  return (
+    <svg {...base} strokeWidth={2.2} className={className} aria-hidden>
+      <path d="m5 12.5 4.5 4.5L19 7" />
     </svg>
   );
 }

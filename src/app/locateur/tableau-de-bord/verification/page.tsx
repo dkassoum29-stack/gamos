@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireLocateur } from "@/lib/auth";
 import VerificationForm from "./VerificationForm";
+import { IconCheck } from "@/components/icons";
 
 const STATUTS: Record<string, { label: string; classes: string; texte: string }> = {
   non_soumis: {
@@ -14,7 +15,7 @@ const STATUTS: Record<string, { label: string; classes: string; texte: string }>
     texte: "Ta pièce a bien été reçue, elle est en cours de vérification.",
   },
   verifie: {
-    label: "Vérifié ✓",
+    label: "Vérifié",
     classes: "bg-green-50 text-green-700",
     texte: "Ton compte est vérifié. Le badge apparaît sur toutes tes annonces.",
   },
@@ -42,7 +43,12 @@ export default async function VerificationPage() {
       </h1>
 
       <div className="mt-4 flex items-center gap-2">
-        <span className={`rounded-full px-3 py-1 text-sm font-medium ${statut.classes}`}>
+        <span
+          className={`flex items-center gap-1 rounded-full px-3 py-1 text-sm font-medium ${statut.classes}`}
+        >
+          {locateur.statutVerification === "verifie" && (
+            <IconCheck className="h-3.5 w-3.5" />
+          )}
           {statut.label}
         </span>
       </div>
