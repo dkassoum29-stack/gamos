@@ -24,14 +24,16 @@ export default async function Navbar() {
         {
           label: "Mes réservations",
           href: "/compte/tableau-de-bord",
-          icon: <IconClipboard className="h-4 w-4 text-zinc-400" />,
+          icon: <IconClipboard className="h-4.5 w-4.5" />,
+          couleur: "bleu" as const,
         },
         ...(locateur
           ? [
               {
                 label: "Tableau de bord locateur",
                 href: "/locateur/tableau-de-bord",
-                icon: <IconKey className="h-4 w-4 text-zinc-400" />,
+                icon: <IconKey className="h-4.5 w-4.5" />,
+                couleur: "ambre" as const,
               },
             ]
           : []),
@@ -40,7 +42,8 @@ export default async function Navbar() {
               {
                 label: "Tableau de bord admin",
                 href: "/admin",
-                icon: <IconShieldCheck className="h-4 w-4 text-zinc-400" />,
+                icon: <IconShieldCheck className="h-4.5 w-4.5" />,
+                couleur: "violet" as const,
               },
             ]
           : []),
