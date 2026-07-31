@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireLocateur } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { logoutAction } from "@/app/locateur/actions";
+import { deconnexionClientAction } from "@/app/compte/actions";
 import { IconHome, IconCar, IconClipboard, IconShieldCheck } from "@/components/icons";
 
 export default async function TableauDeBordLayout({
@@ -62,7 +62,7 @@ export default async function TableauDeBordLayout({
           ))}
         </nav>
         <div className="border-t border-zinc-200 p-3">
-          <form action={logoutAction}>
+          <form action={deconnexionClientAction}>
             <button
               type="submit"
               className="w-full rounded-lg px-3 py-2 text-left text-sm text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 transition-colors"

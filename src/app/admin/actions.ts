@@ -1,77 +1,8 @@
 "use server";
 
-import bcrypt from "bcryptjs";
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import {
-  createAdminSession,
-  destroyAdminSession,
-  requireAdmin,
-  assurerAdminProprietaire,
-} from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-
-export type AdminFormState = { error?: string } | undefined;
-
-export async function inscriptionAdminAction(
-  _prevState: AdminFormState,
-  formData: FormData
-): Promise<AdminFormState> {
-  const dejaExistant = await prisma.admin.count();
-  if (dejaExistant > 0) {
-    return { error: "Un compte administrateur existe déjà." };
-  }
-
-  const nom = String(formData.get("nom") ?? "").trim();
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
-  const motDePasse = String(formData.get("motDePasse") ?? "");
-
-  if (!nom || !email || !motDePasse) {
-    return { error: "Merci de remplir tous les champs." };
-  }
-  if (motDePasse.length < 8) {
-    return { error: "Le mot de passe doit contenir au moins 8 caractères." };
-  }
-
-  const hash = await bcrypt.hash(motDePasse, 10);
-  const admin = await prisma.admin.create({
-    data: { nom, email, motDePasse: hash },
-  });
-
-  await createAdminSession(admin.id);
-  redirect("/admin");
-}
-
-export async function connexionAdminAction(
-  _prevState: AdminFormState,
-  formData: FormData
-): Promise<AdminFormState> {
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
-  const motDePasse = String(formData.get("motDePasse") ?? "");
-
-  await assurerAdminProprietaire();
-
-  const admin = await prisma.admin.findUnique({ where: { email } });
-  if (!admin) {
-    return { error: "Email ou mot de passe incorrect." };
-  }
-  if (!admin.motDePasse) {
-    return { error: "Ce compte utilise la connexion Google. Utilise le bouton Google ci-dessous." };
-  }
-
-  const valide = await bcrypt.compare(motDePasse, admin.motDePasse);
-  if (!valide) {
-    return { error: "Email ou mot de passe incorrect." };
-  }
-
-  await createAdminSession(admin.id);
-  redirect("/admin");
-}
-
-export async function deconnexionAdminAction() {
-  await destroyAdminSession();
-  redirect("/admin/connexion");
-}
 
 export async function validerLocateurAction(
   locateurId: string,
@@ -89,42 +20,66 @@ export async function validerLocateurAction(
 
 export type PromotionFormState = { error?: string; success?: string } | undefined;
 
-export async function promouvoirAdminAction(
+export async function promouvoirRoleAction(
   _prevState: PromotionFormState,
   formData: FormData
 ): Promise<PromotionFormState> {
   await requireAdmin();
 
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const role = String(formData.get("role") ?? "");
+
   if (!email) {
     return { error: "Merci de renseigner un email." };
   }
-
-  const dejaAdmin = await prisma.admin.findUnique({ where: { email } });
-  if (dejaAdmin) {
-    return { error: "Cette personne est déjà administrateur." };
+  if (role !== "admin" && role !== "locateur") {
+    return { error: "Rôle invalide." };
   }
 
-  const [client, locateur] = await Promise.all([
-    prisma.client.findUnique({ where: { email } }),
-    prisma.locateur.findUnique({ where: { email } }),
-  ]);
-  const nom = client?.nom ?? locateur?.nomAgence ?? email.split("@")[0];
+  let client = await prisma.client.findUnique({ where: { email } });
+  if (!client) {
+    client = await prisma.client.create({
+      data: { nom: email.split("@")[0], email },
+    });
+  }
 
-  await prisma.admin.create({ data: { nom, email } });
+  if (role === "admin") {
+    if (client.estAdmin) {
+      return { error: "Cette personne est déjà administrateur." };
+    }
+    await prisma.client.update({
+      where: { id: client.id },
+      data: { estAdmin: true },
+    });
+    revalidatePath("/admin/parametres");
+    return { success: `${email} est maintenant administrateur.` };
+  }
 
+  const dejaLocateur = await prisma.locateur.findUnique({
+    where: { clientId: client.id },
+  });
+  if (dejaLocateur) {
+    return { error: "Cette personne est déjà locateur." };
+  }
+
+  await prisma.locateur.create({
+    data: { nomAgence: client.nom, clientId: client.id },
+  });
   revalidatePath("/admin/parametres");
   return {
-    success: `${email} est maintenant administrateur. Cette personne doit se connecter avec Google (aucun mot de passe n'a été défini).`,
+    success: `${email} est maintenant locateur. Cette personne devra compléter son profil (ville, téléphone) avant de publier des annonces.`,
   };
 }
 
-export async function retirerAdminAction(adminId: string) {
+export async function retirerAdminAction(clientId: string) {
   const admin = await requireAdmin();
-  if (admin.id === adminId) {
+  if (admin.id === clientId) {
     return;
   }
 
-  await prisma.admin.delete({ where: { id: adminId } });
+  await prisma.client.update({
+    where: { id: clientId },
+    data: { estAdmin: false },
+  });
   revalidatePath("/admin/parametres");
 }

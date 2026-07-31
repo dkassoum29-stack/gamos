@@ -73,10 +73,10 @@ export function Diviseur() {
   );
 }
 
-export function BoutonGoogle({ role }: { role: "client" | "locateur" | "admin" }) {
+export function BoutonGoogle() {
   return (
     <a
-      href={`/api/auth/google/start?role=${role}`}
+      href="/api/auth/google/start"
       className="flex w-full items-center justify-center gap-2 rounded-full border border-zinc-300 px-4 py-2.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors"
     >
       <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" aria-hidden>

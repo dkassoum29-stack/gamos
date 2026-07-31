@@ -3,7 +3,12 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { inscriptionClientAction } from "../actions";
-import AuthCard, { ChampAvecIcone, ErreurFormulaire } from "@/components/AuthCard";
+import AuthCard, {
+  ChampAvecIcone,
+  ErreurFormulaire,
+  Diviseur,
+  BoutonGoogle,
+} from "@/components/AuthCard";
 import { IconMail, IconLock, IconUser, IconPhone } from "@/components/icons";
 
 export default function InscriptionClientPage() {
@@ -82,6 +87,9 @@ export default function InscriptionClientPage() {
           {pending ? "Création..." : "Créer mon compte"}
         </button>
       </form>
+
+      <Diviseur />
+      <BoutonGoogle />
     </AuthCard>
   );
 }

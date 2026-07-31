@@ -4,7 +4,12 @@ import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { createClientSession, destroyClientSession, requireClient } from "@/lib/auth";
+import {
+  createSession,
+  destroySession,
+  requireClient,
+  assurerAdminProprietaire,
+} from "@/lib/auth";
 
 export type FormState = { error?: string } | undefined;
 
@@ -34,7 +39,7 @@ export async function inscriptionClientAction(
     data: { nom, telephone, email, motDePasse: hash },
   });
 
-  await createClientSession(client.id);
+  await createSession(client.id);
   redirect("/compte/tableau-de-bord");
 }
 
@@ -44,6 +49,8 @@ export async function connexionClientAction(
 ): Promise<FormState> {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const motDePasse = String(formData.get("motDePasse") ?? "");
+
+  await assurerAdminProprietaire();
 
   const client = await prisma.client.findUnique({ where: { email } });
   if (!client) {
@@ -58,12 +65,12 @@ export async function connexionClientAction(
     return { error: "Email ou mot de passe incorrect." };
   }
 
-  await createClientSession(client.id);
+  await createSession(client.id);
   redirect("/compte/tableau-de-bord");
 }
 
 export async function deconnexionClientAction() {
-  await destroyClientSession();
+  await destroySession();
   redirect("/");
 }
 

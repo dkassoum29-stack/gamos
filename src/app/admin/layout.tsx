@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getAdmin } from "@/lib/auth";
-import { deconnexionAdminAction } from "./actions";
+import { deconnexionClientAction } from "@/app/compte/actions";
 import {
   IconHome,
   IconShieldCheck,
@@ -51,7 +51,7 @@ export default async function AdminLayout({
         </nav>
         <div className="border-t border-zinc-200 p-3">
           <p className="px-3 text-xs text-zinc-500 truncate">{admin.nom}</p>
-          <form action={deconnexionAdminAction} className="mt-1">
+          <form action={deconnexionClientAction} className="mt-1">
             <button
               type="submit"
               className="w-full rounded-lg px-3 py-2 text-left text-sm text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 transition-colors"

@@ -12,11 +12,11 @@ datasource db {
 
 model Locateur {
   id                  String   @id @default(cuid())
+  client               Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId             String   @unique
   nomAgence            String
   ville                String?
   telephone            String?
-  email                String   @unique
-  motDePasse           String?
   createdAt            DateTime @default(now())
   voitures             Voiture[]
   statutVerification   String   @default("non_soumis") // non_soumis, en_attente, verifie, refuse
@@ -30,17 +30,11 @@ model Client {
   email        String        @unique
   telephone    String?
   motDePasse   String?
+  estAdmin     Boolean       @default(false)
   createdAt    DateTime      @default(now())
+  locateur     Locateur?
   reservations Reservation[]
   avis         Avis[]
-}
-
-model Admin {
-  id         String   @id @default(cuid())
-  nom        String
-  email      String   @unique
-  motDePasse String?
-  createdAt  DateTime @default(now())
 }
 
 model Voiture {

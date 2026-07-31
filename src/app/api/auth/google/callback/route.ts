@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { profilDepuisCodeGoogle, type RoleGoogle } from "@/lib/googleAuth";
+import { profilDepuisCodeGoogle } from "@/lib/googleAuth";
 import { prisma } from "@/lib/prisma";
-import {
-  createClientSession,
-  createSession,
-  createAdminSession,
-  assurerAdminProprietaire,
-} from "@/lib/auth";
+import { createSession, assurerAdminProprietaire } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
-  const role = request.nextUrl.searchParams.get("state") as RoleGoogle | null;
-
-  if (!code || !role) {
+  if (!code) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
@@ -24,34 +17,13 @@ export async function GET(request: NextRequest) {
 
   const email = profil.email.toLowerCase();
 
-  if (role === "client") {
-    let client = await prisma.client.findUnique({ where: { email } });
-    if (!client) {
-      client = await prisma.client.create({
-        data: { nom: profil.nom, email },
-      });
-    }
-    await createClientSession(client.id);
-    return NextResponse.redirect(new URL("/compte/tableau-de-bord", request.url));
-  }
-
-  if (role === "locateur") {
-    let locateur = await prisma.locateur.findUnique({ where: { email } });
-    if (!locateur) {
-      locateur = await prisma.locateur.create({
-        data: { nomAgence: profil.nom, email },
-      });
-    }
-    await createSession(locateur.id);
-    return NextResponse.redirect(new URL("/locateur/tableau-de-bord", request.url));
-  }
-
-  // role === "admin" : Google ne crée jamais un nouvel admin, sauf le propriétaire défini par env.
   await assurerAdminProprietaire();
-  const admin = await prisma.admin.findUnique({ where: { email } });
-  if (!admin) {
-    return NextResponse.redirect(new URL("/admin/connexion?erreur=inconnu", request.url));
+
+  let client = await prisma.client.findUnique({ where: { email } });
+  if (!client) {
+    client = await prisma.client.create({ data: { nom: profil.nom, email } });
   }
-  await createAdminSession(admin.id);
-  return NextResponse.redirect(new URL("/admin", request.url));
+
+  await createSession(client.id);
+  return NextResponse.redirect(new URL("/compte/tableau-de-bord", request.url));
 }

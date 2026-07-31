@@ -69,7 +69,7 @@ export default function ConnexionClientPage() {
       </form>
 
       <Diviseur />
-      <BoutonGoogle role="client" />
+      <BoutonGoogle />
     </AuthCard>
   );
 }

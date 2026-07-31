@@ -1,9 +1,6 @@
 import Link from "next/link";
-import { getSession, getClient, getAdmin } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { logoutAction } from "@/app/locateur/actions";
+import { getClient, getLocateur, getAdmin } from "@/lib/auth";
 import { deconnexionClientAction } from "@/app/compte/actions";
-import { deconnexionAdminAction } from "@/app/admin/actions";
 import AccountDropdown from "./AccountDropdown";
 import {
   IconHeart,
@@ -11,19 +8,44 @@ import {
   IconSearch,
   IconKey,
   IconHome,
-  IconUser,
+  IconClipboard,
   IconShieldCheck,
 } from "./icons";
 
 export default async function Navbar() {
-  const session = await getSession();
-  const [locateur, client, admin] = await Promise.all([
-    session
-      ? prisma.locateur.findUnique({ where: { id: session.locateurId } })
-      : null,
+  const [client, locateur, admin] = await Promise.all([
     getClient(),
+    getLocateur(),
     getAdmin(),
   ]);
+
+  const liens = client
+    ? [
+        {
+          label: "Mes réservations",
+          href: "/compte/tableau-de-bord",
+          icon: <IconClipboard className="h-4 w-4 text-zinc-400" />,
+        },
+        ...(locateur
+          ? [
+              {
+                label: "Tableau de bord locateur",
+                href: "/locateur/tableau-de-bord",
+                icon: <IconKey className="h-4 w-4 text-zinc-400" />,
+              },
+            ]
+          : []),
+        ...(admin
+          ? [
+              {
+                label: "Tableau de bord admin",
+                href: "/admin",
+                icon: <IconShieldCheck className="h-4 w-4 text-zinc-400" />,
+              },
+            ]
+          : []),
+      ]
+    : [];
 
   return (
     <header className="sticky top-0 z-30 border-b border-zinc-100 bg-white/80 backdrop-blur-md">
@@ -91,50 +113,11 @@ export default async function Navbar() {
           )}
 
           <AccountDropdown
-            sections={[
-              {
-                titre: "Locataire",
-                icon: <IconUser className="h-4 w-4" />,
-                connecte: !!client,
-                nom: client?.nom,
-                sousTitre: client?.email,
-                dashboardHref: "/compte/tableau-de-bord",
-                dashboardLabel: "Mes réservations",
-                deconnexionAction: deconnexionClientAction,
-                liensConnexion: [
-                  { label: "Se connecter", href: "/compte/connexion" },
-                  { label: "Créer un compte", href: "/compte/inscription" },
-                ],
-              },
-              {
-                titre: "Locateur",
-                icon: <IconKey className="h-4 w-4" />,
-                connecte: !!locateur,
-                nom: locateur?.nomAgence,
-                dashboardHref: "/locateur/tableau-de-bord",
-                dashboardLabel: "Tableau de bord",
-                deconnexionAction: logoutAction,
-                liensConnexion: [
-                  { label: "Se connecter", href: "/locateur/connexion" },
-                  { label: "Devenir locateur", href: "/locateur/inscription" },
-                ],
-              },
-              // L'administration ne s'affiche que pour un admin déjà connecté :
-              // pas d'entrée publique invitant les visiteurs à s'y connecter.
-              ...(admin
-                ? [
-                    {
-                      titre: "Administration",
-                      icon: <IconShieldCheck className="h-4 w-4" />,
-                      connecte: true,
-                      nom: admin.nom,
-                      dashboardHref: "/admin",
-                      dashboardLabel: "Tableau de bord admin",
-                      deconnexionAction: deconnexionAdminAction,
-                    },
-                  ]
-                : []),
-            ]}
+            connecte={!!client}
+            nom={client?.nom}
+            email={client?.email}
+            liens={liens}
+            deconnexionAction={deconnexionClientAction}
           />
         </div>
       </div>

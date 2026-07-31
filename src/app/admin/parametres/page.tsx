@@ -5,7 +5,10 @@ import PromouvoirAdminForm from "./PromouvoirAdminForm";
 
 export default async function ParametresAdminPage() {
   const admin = await requireAdmin();
-  const admins = await prisma.admin.findMany({ orderBy: { createdAt: "asc" } });
+  const admins = await prisma.client.findMany({
+    where: { estAdmin: true },
+    orderBy: { createdAt: "asc" },
+  });
 
   return (
     <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 py-8">
@@ -13,12 +16,12 @@ export default async function ParametresAdminPage() {
 
       <div className="mt-6 rounded-2xl border border-zinc-200 bg-white p-5">
         <h2 className="font-display font-semibold text-zinc-900 mb-1">
-          Ajouter un administrateur
+          Attribuer un rôle
         </h2>
         <p className="text-sm text-zinc-500 mb-4">
-          Donne les droits d&apos;administration à n&apos;importe quel email déjà
-          inscrit (locataire ou locateur) ou nouveau. Cette personne se connecte
-          ensuite avec Google — aucun mot de passe n&apos;est créé.
+          Donne les droits de locateur ou d&apos;administration à n&apos;importe
+          quel email déjà inscrit, ou nouveau. Tout le monde peut déjà réserver
+          des voitures dès son inscription.
         </p>
         <PromouvoirAdminForm />
       </div>

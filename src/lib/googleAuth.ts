@@ -2,15 +2,12 @@ const URL_AUTORISATION = "https://accounts.google.com/o/oauth2/v2/auth";
 const URL_JETON = "https://oauth2.googleapis.com/token";
 const URL_INFOS_UTILISATEUR = "https://openidconnect.googleapis.com/v1/userinfo";
 
-export type RoleGoogle = "client" | "locateur" | "admin";
-
-export function urlAutorisationGoogle(role: RoleGoogle, redirectUri: string) {
+export function urlAutorisationGoogle(redirectUri: string) {
   const params = new URLSearchParams({
     client_id: process.env.GOOGLE_CLIENT_ID ?? "",
     redirect_uri: redirectUri,
     response_type: "code",
     scope: "openid email profile",
-    state: role,
     prompt: "select_account",
   });
   return `${URL_AUTORISATION}?${params.toString()}`;

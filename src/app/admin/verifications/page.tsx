@@ -14,6 +14,7 @@ export default async function VerificationsAdminPage() {
 
   const locateurs = await prisma.locateur.findMany({
     where: { pieceIdentiteChemin: { not: null } },
+    include: { client: true },
     orderBy: { pieceIdentiteEnvoyeeLe: "desc" },
   });
 
@@ -37,7 +38,7 @@ export default async function VerificationsAdminPage() {
                   <div>
                     <p className="font-semibold text-zinc-900">{l.nomAgence}</p>
                     <p className="text-sm text-zinc-500">
-                      {l.email} · {l.telephone} · {l.ville}
+                      {l.client.email} · {l.telephone} · {l.ville}
                     </p>
                     <p className="text-xs text-zinc-400 mt-1">
                       Envoyée le{" "}

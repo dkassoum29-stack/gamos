@@ -12,7 +12,7 @@ export default async function LocateursAdminPage() {
   await requireAdmin();
 
   const locateurs = await prisma.locateur.findMany({
-    include: { _count: { select: { voitures: true } } },
+    include: { _count: { select: { voitures: true } }, client: true },
     orderBy: { createdAt: "desc" },
   });
 
@@ -41,7 +41,7 @@ export default async function LocateursAdminPage() {
                 <tr key={l.id} className="border-b border-zinc-100 last:border-0">
                   <td className="px-4 py-3 font-medium text-zinc-900">{l.nomAgence}</td>
                   <td className="px-4 py-3 text-zinc-600">
-                    {l.email}
+                    {l.client.email}
                     <br />
                     {l.telephone}
                   </td>

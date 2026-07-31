@@ -6,43 +6,61 @@ import { PrismaPg } from "@prisma/adapter-pg";
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
+async function upsertLocateurAvecClient(options: {
+  nomAgence: string;
+  ville: string;
+  telephone: string;
+  email: string;
+  motDePasse: string;
+}) {
+  const client = await prisma.client.upsert({
+    where: { email: options.email },
+    update: {},
+    create: {
+      nom: options.nomAgence,
+      email: options.email,
+      telephone: options.telephone,
+      motDePasse: options.motDePasse,
+    },
+  });
+
+  return prisma.locateur.upsert({
+    where: { clientId: client.id },
+    update: {},
+    create: {
+      clientId: client.id,
+      nomAgence: options.nomAgence,
+      ville: options.ville,
+      telephone: options.telephone,
+    },
+  });
+}
+
 async function main() {
   const motDePasse = await bcrypt.hash("motdepasse123", 10);
 
-  const fasoAuto = await prisma.locateur.upsert({
-    where: { email: "contact@fasoauto.bf" },
-    update: {},
-    create: {
-      nomAgence: "Faso Auto Location",
-      ville: "Ouagadougou",
-      telephone: "70 12 34 56",
-      email: "contact@fasoauto.bf",
-      motDePasse,
-    },
+  const fasoAuto = await upsertLocateurAvecClient({
+    nomAgence: "Faso Auto Location",
+    ville: "Ouagadougou",
+    telephone: "70 12 34 56",
+    email: "contact@fasoauto.bf",
+    motDePasse,
   });
 
-  const boboRent = await prisma.locateur.upsert({
-    where: { email: "contact@bobocarrent.bf" },
-    update: {},
-    create: {
-      nomAgence: "Bobo Car Rent",
-      ville: "Bobo-Dioulasso",
-      telephone: "76 22 33 44",
-      email: "contact@bobocarrent.bf",
-      motDePasse,
-    },
+  const boboRent = await upsertLocateurAvecClient({
+    nomAgence: "Bobo Car Rent",
+    ville: "Bobo-Dioulasso",
+    telephone: "76 22 33 44",
+    email: "contact@bobocarrent.bf",
+    motDePasse,
   });
 
-  const particulier = await prisma.locateur.upsert({
-    where: { email: "issa.k@example.com" },
-    update: {},
-    create: {
-      nomAgence: "Issa K. (particulier)",
-      ville: "Ouagadougou",
-      telephone: "78 55 66 77",
-      email: "issa.k@example.com",
-      motDePasse,
-    },
+  const particulier = await upsertLocateurAvecClient({
+    nomAgence: "Issa K. (particulier)",
+    ville: "Ouagadougou",
+    telephone: "78 55 66 77",
+    email: "issa.k@example.com",
+    motDePasse,
   });
 
   const voitures = [
