@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { get } from "@vercel/blob";
 import { getAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -17,14 +18,12 @@ export async function GET(
     return new NextResponse("Introuvable", { status: 404 });
   }
 
-  const reponse = await fetch(locateur.pieceIdentiteChemin);
-  if (!reponse.ok || !reponse.body) {
+  const resultat = await get(locateur.pieceIdentiteChemin, { access: "private" });
+  if (!resultat) {
     return new NextResponse("Fichier introuvable", { status: 404 });
   }
 
-  return new NextResponse(reponse.body, {
-    headers: {
-      "Content-Type": reponse.headers.get("content-type") ?? "application/octet-stream",
-    },
+  return new NextResponse(resultat.stream, {
+    headers: { "Content-Type": resultat.blob.contentType ?? "application/octet-stream" },
   });
 }

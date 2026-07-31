@@ -17,7 +17,7 @@ export async function enregistrerPieceIdentite(
 
   const extension = fichier.type === "application/pdf" ? "pdf" : fichier.type.split("/")[1];
   const blob = await put(`pieces-identite/${locateurId}.${extension}`, fichier, {
-    access: "public",
+    access: "private",
     addRandomSuffix: true,
   });
 
